@@ -62,8 +62,23 @@ class User extends Authenticatable implements MustVerifyEmail
             'password' => 'hashed',
         ];
     }
-    public function cart()
+
+
+    /**
+     * User jadi hasmany relation sebab dia sama dengan gabungan order dan orderitems
+     * each cart represent each item
+     *
+     * @return void
+     */
+    public function carts()
     {
-        return $this->hasOne(Cart::class);
+        return $this->hasMany(Cart::class);
+    }
+    public function orders()
+    {
+        return $this->hasMany(Orders::class);
+    }
+    public function addresses(){
+        return $this->hasOne(Addresses::class,'customer_id');
     }
 }

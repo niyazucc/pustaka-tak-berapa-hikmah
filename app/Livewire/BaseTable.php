@@ -15,7 +15,7 @@ class BaseTable extends Component implements HasForms, HasTable
     use NotificationTrait;
 
     public ?array $data = [];
-    
+
     public function render()
     {
         return view('livewire.base-table');

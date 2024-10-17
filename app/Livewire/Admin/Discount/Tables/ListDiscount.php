@@ -22,7 +22,7 @@ class ListDiscount extends Component implements HasForms, HasTable
     public function getDiscountStatus(Discount $discount): string
     {
         $now = Carbon::now();
-        
+
         if ($now->isBefore($discount->start_datetime)) {
             return 'upcoming';
         } elseif ($now->between($discount->start_datetime, $discount->end_datetime)) {

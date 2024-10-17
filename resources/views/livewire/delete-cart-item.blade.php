@@ -1,5 +1,7 @@
 <div>
-    <button type="button" wire:click='deleteBookFromCart'
+    
+
+    <button type="button" wire:click='{{confirmDelete()}}'
     class="inline-flex items-center text-sm font-medium text-red-600 hover:underline dark:text-red-500">
     <svg class="me-1.5 h-5 w-5" aria-hidden="true"
         xmlns="http://www.w3.org/2000/svg" width="24" height="24"

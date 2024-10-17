@@ -26,7 +26,7 @@
 
 <body class="font-sans antialiased">
     @include('partials.nav')
-    <x-notification />
+
     @yield('content')
 
     @if (isset($slot) && trim($slot) !== '')
@@ -35,7 +35,7 @@
     @include('partials.footer')
     @livewire('notifications')
 
-    
+
     @filamentScripts
     <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.1/dist/flowbite.min.js"></script>
 </body>

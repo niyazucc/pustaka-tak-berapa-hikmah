@@ -27,7 +27,7 @@
                         <a href="{{ route('profile.show') }}" class="text-white pl-4 p-2 font-semibold">
                             Akaun
                         </a>
-                        <a href="" class="text-white pl-4 p-2 font-semibold">
+                        <a href="{{route('customer.belian')}}" class="text-white pl-4 p-2 font-semibold">
                             Belian
                         </a>
 
@@ -90,16 +90,18 @@
                 <div
                     class="overflow-y-auto py-5 px-3 h-full bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700">
                     <ul class="space-y-2">
-
-                        @foreach ($categories as $category)
-                            <li>
-                                <a href="#"
-                                    class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                                    <span class="rounded-full  bg-gray-300 text-black py-1 px-3">{{ $category->books_count }}</span>
-                                    <span class="ml-3">{{$category->description}}</span>
-                                </a>
-                            </li>
-                        @endforeach
+                        @if (isset($categories) && $categories->isNotEmpty())
+                            @foreach ($categories as $category)
+                                <li>
+                                    <a href="#"
+                                        class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                                        <span
+                                            class="rounded-full  bg-gray-300 text-black py-1 px-3">{{ $category->books_count }}</span>
+                                        <span class="ml-3">{{ $category->description }}</span>
+                                    </a>
+                                </li>
+                            @endforeach
+                        @endif
                     </ul>
                 </div>
             </aside>

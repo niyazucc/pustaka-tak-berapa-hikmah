@@ -1,8 +1,7 @@
 <div class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800 md:p-6">
     <div class="space-y-4 md:flex md:items-center md:justify-between md:gap-6 md:space-y-0">
-        <a href="{{route('bookDetails',['id'=>$cart->books->id])}}" class="shrink-0 md:order-1">
-            <img class="h-20 w-20 dark:hidden" src="{{ asset('storage/' . $cart->books->bookimage1) }}"
-                alt="imac image" />
+        <a href="{{ route('bookDetails', ['id' => $cart->books->id]) }}" class="shrink-0 md:order-1">
+            <img class="h-20 w-20 dark:hidden" src="{{ asset('storage/' . $cart->books->bookimage1) }}" alt="imac image" />
         </a>
 
         <label for="counter-input-{{ $cart->id }}" class="sr-only">Choose quantity:</label>
@@ -32,13 +31,26 @@
                 <p class="text-base font-bold text-gray-900 dark:text-white">RM{{ $cart->total }}</p>
             </div>
         </div>
-
+        @if ($showDeleteModal)
+            <div class="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-75">
+                <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+                    <h2 class="text-xl font-bold mb-4">Confirm Delete</h2>
+                    <p>Are you sure you want to delete this item?</p>
+                    <div class="mt-6 flex justify-end">
+                        <button wire:click="closeModal"
+                            class="bg-gray-500 text-white px-4 py-2 rounded mr-2">Cancel</button>
+                        <button wire:click="deleteBookFromCart({{$cart->id}})"
+                            class="bg-red-600 text-white px-4 py-2 rounded">Delete</button>
+                    </div>
+                </div>
+            </div>
+        @endif
         <div class="w-full min-w-0 flex-1 space-y-4 md:order-2 md:max-w-md">
-            <a href="{{route('bookDetails',['id'=>$cart->books->id])}}"
+            <a href="{{ route('bookDetails', ['id' => $cart->books->id]) }}"
                 class="text-base font-medium text-gray-900 hover:underline dark:text-white">{{ $cart->books->title }}</a>
 
             <div class="flex items-center gap-4">
-                <button type="button" wire:click="deleteBookFromCart({{ $cart->id }})"
+                <button type="button" wire:click="confirmDelete({{ $cart->id }})"
                     class="inline-flex items-center text-sm font-medium text-red-600 hover:underline dark:text-red-500">
                     <svg class="me-1.5 h-5 w-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
                         height="24" fill="none" viewBox="0 0 24 24">

@@ -12,7 +12,14 @@ class DeleteCartItem extends Component
     use NotificationTrait;
     use InteractsWithBanner;
     public $id;
+    public $cartItemId; // Store the ID of the cart item to be deleted
+    public $showDeleteModal = false; // Modal visibility state
 
+    public function confirmDelete($id)
+    {
+        $this->cartItemId = $id;
+        $this->showDeleteModal = true;
+    }
     public function deleteBookFromCart(){
         $cartItem = Cart::find(id: $this->id);
 
