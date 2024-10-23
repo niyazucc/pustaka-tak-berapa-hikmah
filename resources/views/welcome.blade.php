@@ -27,7 +27,7 @@
             {{-- Swiper container for Promosi --}}
             <div class="swiper promosi-swiper mt-5">
                 <div class="swiper-wrapper">
-                    @foreach ($ondiscount as $book)
+                    @foreach ($ondiscounts as $book)
                         <div class="swiper-slide">
                             <x-book-card :book="$book" />
                         </div>

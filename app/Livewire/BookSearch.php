@@ -11,13 +11,17 @@ class BookSearch extends Component
 
     public function render()
     {
-        $results =[];
+        $results = [];
 
-        if(strlen($this->search)>=1){
-            $results = Book::where('title','like','%'.$this->search.'%')->limit(7)->get();
+        if (strlen($this->search) >= 1) {
+            $results = Book::where('title', 'like', '%' . $this->search . '%')->with([
+                'discounts' => function ($q) {
+                    $q->latestDiscount();
+                }
+            ])->limit(7)->get();
         }
 
-        return view('livewire.book-search',[
+        return view('livewire.book-search', [
             'books' => $results
         ]);
     }

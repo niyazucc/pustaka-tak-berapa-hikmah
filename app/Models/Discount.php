@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Discount extends Model
 {
@@ -16,13 +17,18 @@ class Discount extends Model
         'start_datetime',
         'end_datetime'
     ];
-    protected $cast = [
+    protected $casts = [
+        'book_id' => 'array',
         'start_datetime' => 'datetime',
         'end_datetime' => 'datetime',
 
     ];
-    public function book(): BelongsTo
+    public function book()
     {
-        return $this->belongsTo(Book::class, 'book_id');
+        return $this->belongsToMany(Book::class, 'book_discount','discount_id','book_id');
+    }
+    public function scopeLatestDiscount(Builder $q): void
+    {
+        $q->latest('start_datetime');
     }
 }

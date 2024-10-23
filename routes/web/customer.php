@@ -11,6 +11,8 @@ Route::prefix('customer')->name('customer.')->group(function () {
     //belian purchase
     Route::get('/belian',[BelianController::class,'index'])->name('belian');
     Route::get('/belian/{orders_id}',[BelianController::class,'viewOrderDetails'])->name('view-order-details');
+    Route::put('/orders/{id}/update-status', [BelianController::class, 'updateStatus'])->name('updateStatus');
+
     //view cart
     Route::get('/cart', [CartController::class, 'view'])->name('view');
 

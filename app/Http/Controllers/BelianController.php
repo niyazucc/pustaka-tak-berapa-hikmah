@@ -20,6 +20,14 @@ class BelianController extends Controller
         // print_r($orders);
         // die();
         $categories = Category::withCount('books')->get();
-        return view('belian-details', compact('categories','orders'));
+        return view('belian-details', compact('categories', 'orders'));
+    }
+    public function updateStatus(Request $request, $id)
+    {
+        $order = Orders::findOrFail($id);
+        $order->orderstatus = $request->input('orderstatus');
+        $order->save();
+
+        return redirect()->back()->with('success', 'Order status updated to Received.');
     }
 }

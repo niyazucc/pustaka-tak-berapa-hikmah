@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
-use Illuminate\Http\Request;
-
-use App\Http\Controllers\Controller;
 use App\Models\Category;
+
+use App\Models\Discount;
+use Illuminate\Http\Request;
+use Symfony\Component\Clock\now;
 use App\Traits\NotificationTrait;
+use App\Http\Controllers\Controller;
+use App\Models\BookDiscount;
 use Illuminate\Auth\Events\Validated;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
@@ -22,55 +25,98 @@ class BookController extends Controller
     public $currentCategories;
     public function index()
     {
-        // Retrieve books on discount, including the discount details
-        $ondiscount = Book::whereHas('discount') // Only retrieve books with discounts
-            ->with('discount')     // Load discount relationship
-            ->get();
-        // Retrieve latest books, including their discount
+        // Retrieve books with active discounts
+        $ondiscounts = Book::with([
+            'discounts' => function ($q) {
+                $q->latestDiscount();
+            }
+        ])->whereHas('discounts', function ($q) {
+            $q->where('start_datetime', '<=', now())
+                ->where('end_datetime', '>=', now());
+        })->get();
+        // Get all books, regardless of whether they have active discounts
+
+        // Retrieve latest books, including their discounts
         $latest = Book::where('isnew', true)
-            ->with('discount') // Load discount relationship
-            ->get();
+            ->with([
+                'discounts' => function ($q) {
+                    $q->latestDiscount()
+                        ->where('start_datetime', '<=', now())
+                        ->where('end_datetime', '>=', now());
+                }
+            ])->get();
 
-        // Retrieve popular books, including their discount
+        // Retrieve popular books, including their discounts
         $popular = Book::where('popularity', '>', 5)
-            ->with('discount') // Load discount relationship
-            ->get();
+            ->with([
+                'discounts' => function ($q) {
+                    $q->latestDiscount()
+                        ->where('start_datetime', '<=', now())
+                        ->where('end_datetime', '>=', now());
+                }
+            ])->get();
 
+        // Retrieve all categories with book counts
         $categories = Category::withCount('books')->get();
-        // print_r($ondiscount);die();
-        return view('welcome', compact('popular', 'ondiscount', 'latest', 'categories'));
+
+        return view('welcome', compact('popular', 'ondiscounts', 'latest', 'categories'));
     }
 
     public function showByType($type)
     {
-        // You can adjust these conditions based on your actual database fields
         switch ($type) {
             case 'promosi':
-                $books = Book::whereHas('discount') // Only retrieve books with discounts
-                    ->with('discount')     // Load discount relationship
-                    ->get();
+                // Retrieve books with active discounts
+                $books = Book::with([
+                    'discounts' => function ($q) {
+                        $q->latestDiscount()
+                            ->where('start_datetime', '<=', now())
+                            ->where('end_datetime', '>=', now());
+                    }
+                ])->get();
                 break;
+
             case 'keluaran-terbaru':
+                // Retrieve latest books with active discounts
                 $books = Book::where('isnew', true)
-                    ->with('discount') // Load discount relationship
-                    ->get();
+                    ->with([
+                        'discounts' => function ($q) {
+                            $q->latestDiscount()
+                                ->where('start_datetime', '<=', now())
+                                ->where('end_datetime', '>=', now());
+                        }
+                    ])->get();
                 break;
+
             case 'buku-terlaris':
+                // Retrieve popular books with active discounts
                 $books = Book::where('popularity', '>', 5)
-                    ->with('discount') // Load discount relationship
-                    ->get();
+                    ->with([
+                        'discounts' => function ($q) {
+                            $q->latestDiscount()
+                                ->where('start_datetime', '<=', now())
+                                ->where('end_datetime', '>=', now());
+                        }
+                    ])->get();
                 break;
+
             case 'dokumen-terbitan':
+                // Retrieve documents without discount filtering
                 $books = Book::where('is_document', true)->get();
                 break;
+
             default:
+                // Retrieve all books without discount filtering
                 $books = Book::all();
                 break;
         }
-        $count = $books->count();  // Get the count of the books
+
+        $count = $books->count(); // Get the count of the books
         $categories = Category::withCount('books')->get();
-        return view('categorized-book', compact('books', 'type', 'count','categories'));
+
+        return view('categorized-book', compact('books', 'type', 'count', 'categories'));
     }
+
 
     public function listallbooks()
     {
@@ -80,10 +126,16 @@ class BookController extends Controller
     }
     public function viewBookDetails($id)
     {
-        $book = Book::find($id);
+        $book = Book::with([
+            'categories',
+            'discounts' => function ($q) {
+                $q->latestDiscount()->where('start_datetime', '<=', now())
+                    ->where('end_datetime', '>=', now());;
+            }
+        ])->findOrFail($id);
         $currentCategories = $book->categories;
         $categories = Category::withCount('books')->get();
-        return view("book-details", compact("book", "currentCategories",'categories'));
+        return view("book-details", compact("book", "currentCategories", 'categories'));
     }
 
     public function create()

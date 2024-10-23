@@ -29,9 +29,19 @@
                         <div class="flex-initial ml-4 w-64">
                             {{ $book->title }}
                         </div>
+                        @if ($book->discounts->isNotEmpty())
+                        <p class="flex-initial ml-4 w-64 text-red-500">
+                            RM{{ $book->price * (1 - ($book->discounts->first()->discount_rate / 100)) }}
+                        </p>
+                        <div class="flex-initial line-through ml-4 w-32 text-gray-500">
+                            RM{{ $book->price }}
+                        </div>
+                        @else
                         <div class="flex-initial ml-4 w-64 text-red-500">
                             RM{{ $book->price }}
                         </div>
+                        @endif
+
                     </li>
                 </a>
                     @if (!$loop->last)

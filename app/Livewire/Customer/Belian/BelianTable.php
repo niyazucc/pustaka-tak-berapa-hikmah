@@ -54,7 +54,7 @@ class BelianTable extends BaseTable
                     })
                     ->prefix('MYR '),
                 TextColumn::make('created_at')
-                    ->label('Beli Pada')
+                    ->label('Beli Pada')->sortable()
                     ->dateTime('d M Y, h:i A'), // Formatting the timestamp
                 TextColumn::make('orderstatus')
                     ->badge()->label('Status')
