@@ -32,21 +32,26 @@
                     </h1>
                     <div class="mt-4 sm:items-center sm:gap-4 sm:flex">
                         @if ($book->discounts->isNotEmpty())
-                        <p class="text-2xl font-extrabold text-red-500 sm:text-3xl dark:text-white">
-                            RM{{ $book->price * (1 - ($book->discounts->first()->discount_rate / 100)) }}
-                        </p>
-                        <p class="text-xl font-extrabold line-through text-gray-500 sm:text-xl dark:text-white">
-                            RM{{ $book->price }}
-                        </p>
+                            <p class="text-2xl font-extrabold text-red-500 sm:text-3xl dark:text-white">
+                                RM{{ $book->price * (1 - $book->discounts->first()->discount_rate / 100) }}
+                            </p>
+                            <p class="text-xl font-extrabold line-through text-gray-500 sm:text-xl dark:text-white">
+                                RM{{ $book->price }}
+                            </p>
                         @else
-                        <p class="text-2xl font-extrabold text-red-500 sm:text-3xl dark:text-white">
-                            RM{{ $book->price }}
-                        </p>
+                            <p class="text-2xl font-extrabold text-red-500 sm:text-3xl dark:text-white">
+                                RM{{ $book->price }}
+                            </p>
                         @endif
                     </div>
 
                     <div class="mt-4 sm:items-center sm:gap-4 sm:flex">
-                        <form>
+                        <form action="{{ route('customer.addtocart') }}" method="POST" enctype="multipart/form-data">
+                            @csrf
+                            @method('POST')
+                            <input type="hidden" name="book_id" value="{{ $book->id }}">
+                            <input type="hidden" name="price"
+                                value="{{ $book->discounts->isNotEmpty() ? $book->price * (1 - $book->discounts->first()->discount_rate / 100) : $book->price }}">
                             <label for="quantity-input"
                                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Quantity:</label>
                             <div class="relative flex items-center max-w-[8rem]">
@@ -58,7 +63,7 @@
                                             stroke-width="2" d="M1 1h16" />
                                     </svg>
                                 </button>
-                                <input type="text" id="quantity-input" data-input-counter data-input-counter-min="1"
+                                <input type="text" name="quantity" id="quantity-input" data-input-counter data-input-counter-min="1"
                                     data-input-counter-max="{{ $book->stockcount }}"
                                     aria-describedby="helper-text-explanation"
                                     class="bg-gray-50 border-x-0 border-gray-300 h-11 text-center text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block w-full py-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -76,35 +81,29 @@
                                 class="block mt-2 mb-2 text-sm font-medium text-gray-900 dark:text-white">Stocks:
                                 {{ $book->stockcount }}</label>
 
+                            <div class="mt-6 sm:gap-4 sm:items-center sm:flex sm:mt-8">
+                                <div class="grid px-4 bg-red-600 hover:bg-red-400">
+                                    <button type="submit"
+                                        class="text-white bg-red-600 hover:bg-red-400 font-bold text-sm  py-2.5 text-center">
+                                        Tambah ke Troli
+                                    </button>
+                                </div>
+                                <a href="#" title=""
+                                    class="text-white bg-black font-bold text-sm  py-2.5 text-center mt-4 sm:mt-0 focus:ring-4 focus:ring-primary-300  px-5 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800 flex items-center justify-center"
+                                    role="button">
+                                    Beli Sekarang
+                                </a>
+                            </div>
                         </form>
                     </div>
-
-                    <div class="mt-6 sm:gap-4 sm:items-center sm:flex sm:mt-8">
-                        <div class="grid px-4 bg-red-600 hover:bg-red-400">
-                            @livewire('addtocart', [
-                                'bookid' => $book->id,
-                                'quantity' => 1,
-                                'price' => $book->price,
-                            ])
-                        </div>
-
-
-
-                        <a href="#" title=""
-                            class="text-white bg-black font-bold text-sm  py-2.5 text-center mt-4 sm:mt-0 focus:ring-4 focus:ring-primary-300  px-5 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800 flex items-center justify-center"
-                            role="button">
-                            Beli Sekarang
-                        </a>
-                    </div>
-
-                    <hr class="my-6 md:my-8 border-gray-200 dark:border-gray-800" />
-
-                    <p class="mt-6 text-gray-500 dark:text-gray-400">
-                        {{ $book->synopsis }}
-                    </p>
-
                 </div>
+
             </div>
+            <hr class="my-6 md:my-8 border-gray-200 dark:border-gray-800" />
+
+            <p class="mt-6 text-gray-500 dark:text-gray-400">
+                {{ $book->synopsis }}
+            </p>
         </div>
     </section>
     <section class="bg-white mx-auto max-w-screen-xl px-4 py-8">
@@ -115,7 +114,7 @@
                 <p>Tahun Terbitan: {{ $book->publishyear }}</p>
                 <p>ISBN: {{ $book->isbn }}</p>
                 <p>Bil. Muka Surat: {{ $book->page }} muka surat</p>
-                <p>Berat: {{ $book->isbn }}g</p>
+                <p>Berat: {{ $book->weight }}g</p>
 
                 @if ($book->synopsis)
                     <h3><b>Sinopsis</b></h3>
@@ -123,18 +122,15 @@
                 @endif
                 <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
                     Categories:
-                        @if ($currentCategories->isNotEmpty())
-                            @foreach ($currentCategories as $cat)
-                                <button class="bg-red-500 text-white px-2 py-1">
-                                    {{ $cat->description }}
-                                </button>
-                            @endforeach
-                        @endif
-
+                    @if ($currentCategories->isNotEmpty())
+                        @foreach ($currentCategories as $cat)
+                            <button class="bg-red-500 text-white px-2 py-1">
+                                {{ $cat->description }}
+                            </button>
+                        @endforeach
+                    @endif
                 </label>
             </div>
- 
         </div>
     </section>
-
-    @endsection
+@endsection

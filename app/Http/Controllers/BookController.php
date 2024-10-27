@@ -69,11 +69,12 @@ class BookController extends Controller
                 // Retrieve books with active discounts
                 $books = Book::with([
                     'discounts' => function ($q) {
-                        $q->latestDiscount()
-                            ->where('start_datetime', '<=', now())
-                            ->where('end_datetime', '>=', now());
+                        $q->latestDiscount();
                     }
-                ])->get();
+                ])->whereHas('discounts', function ($q) {
+                    $q->where('start_datetime', '<=', now())
+                        ->where('end_datetime', '>=', now());
+                })->get();
                 break;
 
             case 'keluaran-terbaru':

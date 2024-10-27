@@ -10,21 +10,33 @@
                 Alamat Ku
             </h2>
             <div class="shadow rounded-sm ">
-                @if (auth()->user()->addresses)
-                    <!-- User has at least one address -->
-                    <div class="col-span-1 py-2 px-2 font-bold text-left">
-                        {{ auth()->user()->addresses->first()->name }}
-                    </div>
-                    <div class="col-span-2 py-2 px-2">
-                        <!-- Display the first address -->
-                        <p>{{ auth()->user()->addresses->first()->address }}</p>
-                        <p>{{ auth()->user()->addresses->first()->phone_number }}</p>
-                    </div>
-                    <div class="col-span-1 py-2 px-2 text-right">
-                        <button class="underline underline-offset-1" data-modal-toggle="changeAddressModal"
-                            data-modal-target="changeAddressModal">Change
-                            Address</button>
-                    </div>
+                @if (auth()->check() && auth()->user()->addresses && auth()->user()->addresses->isNotEmpty())
+                    @php
+                        $firstAddress = auth()->user()->addresses->first();
+                    @endphp
+                    @if ($firstAddress)
+                        <!-- User has at least one address -->
+                        <div class="col-span-1 py-2 px-2 font-bold text-left">
+                            {{ $firstAddress->name }}
+                        </div>
+                        <div class="col-span-2 py-2 px-2">
+                            <!-- Display the first address -->
+                            <p>{{ $firstAddress->address }}</p>
+                            <p>{{ $firstAddress->phone_number }}</p>
+                        </div>
+                        <div class="col-span-1 py-2 px-2 text-right">
+                            <button class="underline underline-offset-1" data-modal-toggle="changeAddressModal"
+                                data-modal-target="changeAddressModal">Change Address</button>
+                        </div>
+                    @else
+                        <!-- No addresses found -->
+                        <div class="col-span-4 py-6 px-2 text-center">
+                            <p class="pb-2">You don't have any saved addresses. Please add a new address.</p>
+                            <button id="defaultModalButton" data-modal-target="defaultModal"
+                                data-modal-toggle="defaultModal"
+                                class="bg-red-500 hover:bg-red-400 text-white py-2 px-4 rounded">Add New Address</button>
+                        </div>
+                    @endif
                 @else
                     <!-- No addresses found -->
                     <div class="col-span-4 py-6 px-2 text-center">
@@ -51,16 +63,20 @@
                                     <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
                                         xmlns="http://www.w3.org/2000/svg">
                                         <path fill-rule="evenodd"
-                                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414 1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
                                             clip-rule="evenodd"></path>
                                     </svg>
                                     <span class="sr-only">Close modal</span>
                                 </button>
                             </div>
-                            <!-- Modal body -->
                             <div class="mt-5">
-                                @livewire('address.address-form',['addresses'=>auth()->user()->addresses->first()   ])
+                                @if (auth()->check() && auth()->user()->addresses()->exists())
+                                    @livewire('address.address-form', ['addresses' => auth()->user()->addresses->first()])
+                                @endif
                             </div>
+
+
+
                         </div>
                     </div>
                 </div>
@@ -130,12 +146,9 @@
                 </div>
                 {{-- End Cart --}}
 
-
-
                 <div class="mx-auto mt-6 max-w-4xl flex-1 space-y-6 lg:mt-0 lg:w-full">
                     @livewire('cart.order-summary')
                 </div>
-
             </div>
         </div>
     </section>

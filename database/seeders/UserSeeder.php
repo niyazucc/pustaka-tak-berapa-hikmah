@@ -18,7 +18,7 @@ class UserSeeder extends Seeder
             'name' => 'Admin User',
             'email' => 'admin@example.com',
             'password' => Hash::make('password'), // Use a hashed password
-            'category' => 'admin',
+            'role' => 'admin',
         ]);
 
         // Create regular users
@@ -26,7 +26,7 @@ class UserSeeder extends Seeder
             'name' => 'User One',
             'email' => 'user1@example.com',
             'password' => Hash::make('password'),
-            'category' => 'customer',
+            'role' => 'customer',
         ]);
     }
 }

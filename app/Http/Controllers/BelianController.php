@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Orders;
 use App\Models\Category;
+use App\Traits\NotificationTrait;
 use Illuminate\Http\Request;
 
 class BelianController extends Controller
 {
+    use NotificationTrait;
     public function index()
     {
         $categories = Category::withCount('books')->get();
@@ -28,6 +30,7 @@ class BelianController extends Controller
         $order->orderstatus = $request->input('orderstatus');
         $order->save();
 
-        return redirect()->back()->with('success', 'Order status updated to Received.');
+        $this->popupNotification('Success', 'Order status is now completed!');
+        return redirect()->back();
     }
 }

@@ -19,9 +19,10 @@
                         @csrf
                         @method('PUT')
                         <input type="hidden" name="orderstatus" value="Completed">
-                        <button type="submit" class="mt-3 px-4 py-2 bg-red-500 border-red-400 text-white rounded-lg shadow">
+                        <button type="submit"
+                            class="mt-3 px-4 py-2 bg-red-500 border-red-400 text-white rounded-lg shadow">
                             Confirm Order Received
-                        </button>d
+                        </button>
                     </form>
                 </div>
             @endif
@@ -46,7 +47,13 @@
             <div class="bg-white p-4 rounded-lg shadow">
                 <h3 class="text-lg font-semibold mb-2">Books Purchased</h3>
                 <ul class="divide-y divide-gray-200">
+                    @php
+                        $orderTotal = 0; // Initialize order total
+                    @endphp
                     @foreach ($orders->orderitems as $item)
+                        @php
+                            $orderTotal += $item->total; // Accumulate the total for each item
+                        @endphp
                         <li class="py-4 flex justify-between">
                             <div>
                                 <a href="{{ route('bookDetails', ['id' => $item->book->id]) }}"
@@ -59,6 +66,21 @@
                             </div>
                         </li>
                     @endforeach
+
+                    @if ($orders->name !== 'Pickup Location')
+                        @php
+                            $orderTotal += 5; // Add 5 to the total if not a Pickup Location
+                        @endphp
+                    @endif
+
+                    <li class="py-4 flex justify-between">
+
+                        <div>
+                            <p class="text-gray-900 font-semibold">Order's Total: MYR {{ number_format($orderTotal, 2) }}
+                            </p>
+
+                        </div>
+                    </li>
                 </ul>
             </div>
         </div>

@@ -1,4 +1,5 @@
 <?php
+
 use App\Livewire\CreateBook;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BookController;
@@ -30,7 +31,4 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/discount', [DiscountController::class, 'listalldiscount'])->name('discount');
     Route::get('/discount/create', [DiscountController::class, 'create'])->name('creatediscount');
     Route::get('/discount/{id}/edit', [DiscountController::class, 'edit'])->name('editdiscount');
-
-
-
 });
